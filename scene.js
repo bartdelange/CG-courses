@@ -41,6 +41,14 @@ var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
 
 scene.add( skyBox );
 
+// ground
+var mat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('texture_grass.jpg')});
+var geo = new THREE.PlaneBufferGeometry(2000, 2000, 8, 8);
+var goundPlane = new THREE.Mesh(geo, mat);
+
+scene.add(goundPlane);
+goundPlane.rotateX( - Math.PI / 2);
+
 // Json models
 var loader = new THREE.ObjectLoader();
 
@@ -59,11 +67,16 @@ function addModel(path, x= 0, y=0 ,z=0) {
 addModel("./models/json/tree-toon.json",10,0,0);
 addModel("./models/json/lamp.json");
 
-// ground (should be plane, not cube)
-var geometry = new THREE.BoxGeometry(2000,0,2000);
-var material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('texture_grass.jpg')});
-var cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+
+
+
+
+
+
+
+
+
+
 
 // import camera control and rotation library
 controls = new THREE.OrbitControls( camera );
