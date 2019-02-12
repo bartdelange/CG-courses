@@ -1,78 +1,161 @@
-// Create scene
+// Create scene and default loaders
 var scene = new THREE.Scene();
+var textureLoader = new THREE.TextureLoader();
+var objectLoader = new THREE.ObjectLoader();
+textureLoader.crossOrigin = null;
+objectLoader.setCrossOrigin(null);
 
-// Create camera
+/**********
+ * Camera *
+ **********/
 var camera = new THREE.PerspectiveCamera(
     75, // fov — Camera frustum vertical field of view.
     window.innerWidth / window.innerHeight, // aspect — Camera frustum aspect ratio.
     0.1, // near — Camera frustum near plane.
     5000); // far — Camera frustum far plane.
 
-// Create renderer
-var renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+camera.position.x = 20; //move right from center of scene
+camera.position.y = 10; //move up from center of scene
+camera.position.z = 50; //move camera away from center of scene
+
+/************
+ * Renderer *
+ ************/
+renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
+renderer.gammaInput = true;
+renderer.gammaOutput = true;
+renderer.shadowMap.enabled = true;
 
-// light
-var light = new THREE.DirectionalLight(0xdddddd, 1);
-light.position.set(0, 0, 1);
-scene.add(light);
+/*******
+ * Sun *
+ *******/
+// Light all areas with a hemi light (simulates "reflection")
+hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
+hemiLight.color.setHSL(0.6, 1, 0.6);
+hemiLight.groundColor.setHSL(0.095, 1, 0.75);
+hemiLight.position.set(0, 500, 0);
+scene.add(hemiLight);
 
-camera.position.x = 2; //move right from center of scene
-camera.position.y = 1; //move up from center of scene
-camera.position.z = 5; //move camera away from center of scenefir
+// Create a "Sun" light that creates brighter light points where the sun would shine
+dirLight = new THREE.DirectionalLight(0xffffff, 1);
+dirLight.color.setHSL(0.1, 1, 0.95);
+dirLight.position.set(-20, 27.5, 20);
+dirLight.position.multiplyScalar(30);
+scene.add(dirLight);
+dirLight.castShadow = true;
+dirLight.shadow.mapSize.width = 2048;
+dirLight.shadow.mapSize.height = 2048;
+var d = 100;
+dirLight.shadow.camera.left = - d;
+dirLight.shadow.camera.right = d;
+dirLight.shadow.camera.top = d;
+dirLight.shadow.camera.bottom = - d;
+dirLight.shadow.camera.far = 3500;
+dirLight.shadow.bias = - 0.0001;
+
+// Create a sun shape
+var sunGeometry = new THREE.SphereGeometry(60, 64, 64);
+var sunMaterial = new THREE.MeshBasicMaterial({ map: textureLoader.load('sun.jpg') });
+var sun = new THREE.Mesh(sunGeometry, sunMaterial);
+sun.position.set(-20, 27.5, 20);
+sun.position.multiplyScalar(50);
+scene.add(sun);
 
 
-// skybox
-var directions = ["textures/sky_right.png", "textures/sky_left.png", "textures/sky_top.png", "textures/sky_bottom.png", "textures/sky_front.png", "textures/sky_back.png"];
-var materialArray = [];
-for (var i = 0; i < 6; i++) {
-    materialArray.push(
-        new THREE.MeshBasicMaterial({
-            map: THREE.ImageUtils.loadTexture(directions[i]),
-            side: THREE.BackSide
-        })
-    );
-}
+/**********
+ * Skybox *
+ **********/
+scene.background = new THREE.Color().setHSL(0.6, 0, 1);
+scene.fog = new THREE.Fog(scene.background, 1, 5000);
 
-var skyGeometry = new THREE.CubeGeometry(5000, 5000, 5000);
-var skyMaterial = new THREE.MeshFaceMaterial(materialArray);
-var skyBox = new THREE.Mesh(skyGeometry, skyMaterial);
+var vertexShader = document.getElementById('vertexShader').textContent;
+var fragmentShader = document.getElementById('fragmentShader').textContent;
+var uniforms = {
+    "topColor": { value: new THREE.Color(0x0077ff) },
+    "bottomColor": { value: new THREE.Color(0xffffff) },
+    "offset": { value: 33 },
+    "exponent": { value: 0.6 }
+};
 
-scene.add(skyBox);
+uniforms["topColor"].value.copy(hemiLight.color);
+scene.fog.color.copy(uniforms["bottomColor"].value);
 
-// ground
-var mat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('textures/texture_grass.jpg')});
-var geo = new THREE.PlaneBufferGeometry(2000, 2000, 8, 8);
-var goundPlane = new THREE.Mesh(geo, mat);
+var skyGeo = new THREE.SphereBufferGeometry(4000, 32, 15);
+var skyMat = new THREE.ShaderMaterial({
+    uniforms: uniforms,
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    side: THREE.BackSide
+});
+var sky = new THREE.Mesh(skyGeo, skyMat);
 
-scene.add(goundPlane);
-goundPlane.rotateX(-Math.PI / 2);
+scene.add(sky);
 
-var roadMat = new THREE.MeshNormalMaterial();
-var roadGeo = new THREE.PlaneBufferGeometry(100, 500, 9, 8);
-var roadPlane = new THREE.Mesh(roadGeo, roadMat);
+/**********
+ * ground *
+ **********/
+let grass = textureLoader.load("textures/texture_grass.jpg");
+grass.anisotropy = 32;
+grass.repeat.set(100, 100);
+grass.wrapT = THREE.RepeatWrapping;
+grass.wrapS = THREE.RepeatWrapping;
 
-scene.add(roadPlane);
-roadPlane.rotateX(-Math.PI / 2);
-roadPlane.position.set(0, 0.1, 0);
+var groundGeo = new THREE.PlaneGeometry(10000, 10000);
+var groundMat = new THREE.MeshPhongMaterial({ map: grass })
+var ground = new THREE.Mesh(groundGeo, groundMat);
+ground.position.set(0, 0, 0);
+ground.rotation.x -= Math.PI / 2;
+ground.receiveShadow = true;
+ground.castShadow = false;
+scene.add(ground);
 
-// Json models
-var loader = new THREE.ObjectLoader();
 
+/***************
+ * JSON Models *
+ ***************/
 // add model to scene from path
 // add x y z if you want to translate it at a given vector
-function addModel(path, x = 0, y = 0, z = 0,width=1,length=1,height=1) {
-    loader.load(path, function (object) {
+function addModel(path, x = 0, y = 0, z = 0, scale = 1) {
+    objectLoader.load(path, function (object) {
 
-        // then directly add the object
-        var transformation = new THREE.Matrix4().makeScale(width, length, height);
+        object.traverse(function (child) {
+            if (child instanceof THREE.Mesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+        });
+        var transformation = new THREE.Matrix4().makeScale(scale, scale, scale);
 
         object.applyMatrix(transformation);
-        scene.add(object);
         object.position.set(x, y, z);
-
+        scene.add(object);
     });
+}
+
+// add models
+addModel("./models/json/tree-toon.json", 10, 0, 0,10);
+addModel("./models/json/lamp.json",0,0,0,0.6);
+
+
+/***************
+ * Custom tree *
+ ***************/
+var geometry = new THREE.SphereGeometry(5, 8, 6);
+var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+var sphere = new THREE.Mesh(geometry, material);
+sphere.position.set(10, 10, 10);
+sphere.receiveShadow = true;
+sphere.castShadow = true;
+scene.add(sphere);
+
+function addObjectWithShadow(object){
+    scene.add(object);
+    object.receiveShadow = true;
+    object.castShadow = true;
+    return object;
 }
 
 function createHouse(x = 0, y = 0, z = 0) {
@@ -80,12 +163,13 @@ function createHouse(x = 0, y = 0, z = 0) {
     var width = 60;
     var length = 80;
 
-    var geometry, material;
+    // kinda bad to reuse a var, but better for memory
+    var geometry, material, texture;
+
+
     geometry = new THREE.BoxGeometry(width, 24, length);
 
-    var loader = new THREE.TextureLoader();
-
-    var texture = loader.load('textures/brick_wall.jpg', function (texture) {
+    texture = textureLoader.load('textures/brick_wall.jpg', function (texture) {
 
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         texture.offset.set(0, 0);
@@ -95,10 +179,10 @@ function createHouse(x = 0, y = 0, z = 0) {
 
     material = new THREE.MeshBasicMaterial({map: texture});
     var cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
     cube.position.set(x, y + 12, z);
     cube.rotateY(-Math.PI / 2);
 
+    addObjectWithShadow(cube);
 // new var instead of geometry
     geometry = new THREE.Geometry();
 
@@ -127,9 +211,7 @@ function createHouse(x = 0, y = 0, z = 0) {
 
     geometry.faceVertexUvs[0].push([], [], [uvs[0], uvs[1], uvs[2]], [uvs[0], uvs[1], uvs[2]], [uvs[0], uvs[1], uvs[2]], [uvs[0], uvs[1], uvs[2]]);
 
-    loader = new THREE.TextureLoader();
-
-    texture = loader.load('textures/roof.jpg', function (texture) {
+    texture = textureLoader.load('textures/roof.jpg', function (texture) {
 
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         texture.offset.set(0, 0);
@@ -141,135 +223,126 @@ function createHouse(x = 0, y = 0, z = 0) {
     var transformation = new THREE.Matrix4().makeScale(width, length, 26);
 
     geometry.applyMatrix(transformation);
-/// xxx
-
-    scene.add(roof);
 
     roof.rotateX(-Math.PI / 2);
     roof.rotateZ(-Math.PI / 2);
     roof.position.set(x - 40, y + 24, z - 30);
-
-
-    // doors, windows etc
-
+    addObjectWithShadow(roof);
 
     // windows
-    var mat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('textures/window.jpg')});
-    var geo = new THREE.PlaneBufferGeometry(18, 13, 8, 8);
-    var window1 = new THREE.Mesh(geo, mat);
+    material = new THREE.MeshBasicMaterial({map: textureLoader.load('textures/window.jpg')});
+    geometry = new THREE.PlaneBufferGeometry(18, 13, 8, 8);
+    var window1 = new THREE.Mesh(geometry, material);
 
-    scene.add(window1);
     window1.rotateY(-Math.PI / 2);
     window1.position.set(x - 40.1, 12, z - 9);
+    addObjectWithShadow(window1);
 
-    mat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('textures/window.jpg')});
-    geo = new THREE.PlaneBufferGeometry(18, 13, 8, 8);
-    var window2 = new THREE.Mesh(geo, mat);
+    material = new THREE.MeshBasicMaterial({map: textureLoader.load('textures/window.jpg')});
+    geometry = new THREE.PlaneBufferGeometry(18, 13, 8, 8);
+    var window2 = new THREE.Mesh(geometry, material);
 
-    scene.add(window2);
     window2.rotateY(-Math.PI / 2);
     window2.position.set(x - 40.1, 12, z - 9);
-
+    addObjectWithShadow(window2);
 
     // doors
-    mat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('textures/door.jpg')});
-    geo = new THREE.PlaneBufferGeometry(9, 20, 8, 8);
-    var doorFront = new THREE.Mesh(geo, mat);
+    material = new THREE.MeshBasicMaterial({map: textureLoader.load('textures/door.jpg')});
+    geometry = new THREE.PlaneBufferGeometry(9, 20, 8, 8);
+    var doorFront = new THREE.Mesh(geometry, material);
 
-    scene.add(doorFront);
     doorFront.rotateY(-Math.PI / 2);
     doorFront.position.set(x - 40.1, 10, z + 11);
-
+    addObjectWithShadow(doorFront);
 
     // Mail box
     geometry = new THREE.BoxBufferGeometry(1, 11, 1);
-    mat = new THREE.MeshBasicMaterial({color: 0x8B4513});
-    var pole = new THREE.Mesh(geometry, mat);
-    scene.add(pole);
+    material = new THREE.MeshBasicMaterial({color: 0x8B4513});
+    var pole = new THREE.Mesh(geometry, material);
 
     pole.position.set(x - 50, 5.5, z + 4);
 
 
     geometry = new THREE.BoxBufferGeometry(3, 3, 5);
-    mat = new THREE.MeshToonMaterial({color: 0xff0000});
-    var boxRec = new THREE.Mesh(geometry, mat);
+    material = new THREE.MeshToonMaterial({color: 0xff0000});
+    var boxRec = new THREE.Mesh(geometry, material);
 
-
-    scene.add(boxRec);
     boxRec.position.set(x - 50, 11, z + 4);
     boxRec.rotateY(-Math.PI / 2);
 
     geometry = new THREE.CylinderGeometry(1.5, 1.5, 5);
-    mat = new THREE.MeshToonMaterial({color: 0xff0000});
-    var boxCil = new THREE.Mesh(geometry, mat);
+    material = new THREE.MeshToonMaterial({color: 0xff0000});
+    var boxCil = new THREE.Mesh(geometry, material);
 
-    scene.add(boxCil);
     boxCil.position.set(x - 50, 12.5, z + 4);
     boxCil.rotateZ(-Math.PI / 2);
 
+    addObjectWithShadow(pole);
+    addObjectWithShadow(boxRec);
+    addObjectWithShadow(boxCil);
+
+
     // tree
     geometry = new THREE.CylinderGeometry(1.6, 2.4, 20);
-    mat = new THREE.MeshToonMaterial({color: 0x8B4513});
-    var trunk = new THREE.Mesh(geometry, mat);
+    material = new THREE.MeshToonMaterial({color: 0x8B4513});
+    var trunk = new THREE.Mesh(geometry, material);
 
-    scene.add(trunk);
     trunk.position.set(x - 30, 10, z + 50);
 
     // big leave sphere
     geometry = new THREE.SphereGeometry(10);
-    mat = new THREE.MeshPhysicalMaterial({color: 0x3A5F0B});
-    var bigSphereLeaves = new THREE.Mesh(geometry, mat);
+    material = new THREE.MeshPhysicalMaterial({color: 0x3A5F0B});
+    var bigSphereLeaves = new THREE.Mesh(geometry, material);
 
-    scene.add(bigSphereLeaves);
     bigSphereLeaves.position.set(x - 30, 25, z + 50);
 
     // branch 1
     geometry = new THREE.CylinderGeometry(0.6, 0.4, 8);
-    mat = new THREE.MeshToonMaterial({color: 0x8B4513});
-    var branch1 = new THREE.Mesh(geometry, mat);
+    material = new THREE.MeshToonMaterial({color: 0x8B4513});
+    var branch1 = new THREE.Mesh(geometry, material);
 
-    scene.add(branch1);
     branch1.position.set(x - 30, 12, z + 50 + 4);
     branch1.rotateX(-Math.PI / 1.66);
     // leaves
     geometry = new THREE.SphereGeometry(2);
-    mat = new THREE.MeshToonMaterial({color: 0x3A5F0B});
-    var branch1Leaves = new THREE.Mesh(geometry, mat);
+    material = new THREE.MeshToonMaterial({color: 0x3A5F0B});
+    var branch1Leaves = new THREE.Mesh(geometry, material);
 
-    scene.add(branch1Leaves);
     branch1Leaves.position.set(x - 30, 13.5 , z + 50 + 8);
 
     // branch 2
     geometry = new THREE.CylinderGeometry(0.6, 0.4, 8);
-    mat = new THREE.MeshToonMaterial({color: 0x8B4513});
-    var branch2 = new THREE.Mesh(geometry, mat);
+    material = new THREE.MeshToonMaterial({color: 0x8B4513});
+    var branch2 = new THREE.Mesh(geometry, material);
 
-    scene.add(branch2);
     branch2.position.set(x - 30, 11, z + 50 - 4);
     branch2.rotateX(Math.PI / 1.33);
     // leaves
     geometry = new THREE.SphereGeometry(2);
-    mat = new THREE.MeshLambertMaterial({color: 0x3A5F0B});
-    var branch2Leaves = new THREE.Mesh(geometry, mat);
+    material = new THREE.MeshLambertMaterial({color: 0x3A5F0B});
+    var branch2Leaves = new THREE.Mesh(geometry, material);
 
-    scene.add(branch2Leaves);
     branch2Leaves.position.set(x - 30, 15 , z + 50 - 8);
+
+    addObjectWithShadow(trunk);
+    addObjectWithShadow(bigSphereLeaves);
+
+    addObjectWithShadow(branch1);
+    addObjectWithShadow(branch1Leaves);
+
+    addObjectWithShadow(branch2);
+    addObjectWithShadow(branch2Leaves);
 
 }
 
-// add models
-addModel("./models/json/tree-toon.json", 10, 0, 0,10,10,10);
-addModel("./models/json/lamp.json");
-
-
 createHouse(100, 0, 50);
-
 
 createHouse(100, 0, -50);
 
 // import camera control and rotation library
 controls = new THREE.OrbitControls(camera);
 controls.enableKeys = true;
+controls.dampingFactor = 1;
 
 // RENDER
 var render = function () {
