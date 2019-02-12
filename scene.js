@@ -48,7 +48,7 @@ scene.add(dirLight);
 dirLight.castShadow = true;
 dirLight.shadow.mapSize.width = 2048;
 dirLight.shadow.mapSize.height = 2048;
-var d = 100;
+var d = 2000;
 dirLight.shadow.camera.left = - d;
 dirLight.shadow.camera.right = d;
 dirLight.shadow.camera.top = d;
@@ -137,7 +137,7 @@ function addModel(path, x = 0, y = 0, z = 0, scale = 1) {
 
 // add models
 addModel("./models/json/tree-toon.json", 10, 0, 0,10);
-addModel("./models/json/lamp.json",0,0,0,0.6);
+addModel("./models/json/lamp.json",-10,0,10,0.3);
 
 
 /***************
@@ -242,8 +242,8 @@ function createHouse(x = 0, y = 0, z = 0) {
     geometry = new THREE.PlaneBufferGeometry(18, 13, 8, 8);
     var window2 = new THREE.Mesh(geometry, material);
 
-    window2.rotateY(-Math.PI / 2);
-    window2.position.set(x - 40.1, 12, z - 9);
+    window2.rotateY(Math.PI / 2);
+    window2.position.set(x - 40.1+80.2, 12, z );
     addObjectWithShadow(window2);
 
     // doors
