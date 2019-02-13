@@ -33,7 +33,7 @@ function addWorldObjects(scene) {
 
     // Create a sun shape
     var sunGeometry = new THREE.SphereGeometry(60, 64, 64);
-    var sunMaterial = new THREE.MeshBasicMaterial({ map: textureLoader.load('sun.jpg') });
+    var sunMaterial = new THREE.MeshBasicMaterial({ map: textureLoader.load('textures/sun.jpg') });
     var sun = new THREE.Mesh(sunGeometry, sunMaterial);
     sun.position.set(-20, 27.5, 20);
     sun.position.multiplyScalar(50);
