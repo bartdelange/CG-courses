@@ -31,13 +31,16 @@ function addWorldObjects(scene) {
     dirLight.shadow.camera.far = 3500;
     dirLight.shadow.bias = - 0.0001;
 
-    // Create a sun shape
-    var sunGeometry = new THREE.SphereGeometry(60, 64, 64);
-    var sunMaterial = new THREE.MeshBasicMaterial({ map: textureLoader.load('textures/sun.jpg') });
-    var sun = new THREE.Mesh(sunGeometry, sunMaterial);
-    sun.position.set(-20, 27.5, 20);
-    sun.position.multiplyScalar(50);
-    scene.add(sun);
+    // These create a sun like effect
+    var textureFlare0 = textureLoader.load( 'textures/lensflare0.png' );
+    var textureFlare3 = textureLoader.load( 'textures/lensflare3.png' );
+    var lensflare = new THREE.Lensflare();
+    lensflare.addElement( new THREE.LensflareElement( textureFlare0, 700, 0, dirLight.color ) );
+    lensflare.addElement( new THREE.LensflareElement( textureFlare3, 60, 0.6 ) );
+    lensflare.addElement( new THREE.LensflareElement( textureFlare3, 70, 0.7 ) );
+    lensflare.addElement( new THREE.LensflareElement( textureFlare3, 120, 0.9 ) );
+    lensflare.addElement( new THREE.LensflareElement( textureFlare3, 70, 1 ) );
+    dirLight.add( lensflare );
 
     /**********
      * Skybox *

@@ -12,7 +12,6 @@ function createRoad(x, y, z, length) {
 
     // Asphalt
     var asphaltTexture = textureLoader.load('textures/asphalt.jpg');
-    
     asphaltTexture.repeat.set(1, 100);
     asphaltTexture.wrapT = asphaltTexture.wrapS = THREE.RepeatWrapping;
     var geometry = new THREE.PlaneGeometry(roadWidth, length, 32);
