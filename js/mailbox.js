@@ -1,3 +1,10 @@
+/**
+ * Create's a basic red American mailbox
+ * 
+ * @param {int} x 
+ * @param {int} y 
+ * @param {int} z 
+ */
 function mailbox(x, y, z) {
     var mailbox = new THREE.Group();
 

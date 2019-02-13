@@ -1,11 +1,11 @@
 /**
- * Create's a basic piramid roof house with a tree and a mailbox
+ * Create's a basic pyramid roof house with a tree, a mailbox and a lightpost
  * 
- * @param int x 
- * @param int y 
- * @param int z 
+ * @param {int} x 
+ * @param {int} y 
+ * @param {int} z 
  */
-function createPiramidHouse(x = 0, y = 0, z = 0) {
+function createpyramidHouse(x = 0, y = 0, z = 0) {
     var width = 60;
     var length = 80;
 
@@ -19,7 +19,7 @@ function createPiramidHouse(x = 0, y = 0, z = 0) {
         texture.offset.set(0, 0);
         texture.repeat.set(4, 2);
     });
-    material = new THREE.MeshPhongMaterial({map: texture});
+    material = new THREE.MeshStandardMaterial({map: texture});
     var cube = new THREE.Mesh(geometry, material);
     cube.position.set(x, y + 12, z);
     cube.rotateY(-Math.PI / 2);
@@ -65,7 +65,7 @@ function createPiramidHouse(x = 0, y = 0, z = 0) {
     house.add(addShadowToObject(roof));
 
     // Window 1
-    material = new THREE.MeshPhongMaterial({map: textureLoader.load('textures/window.jpg')});
+    material = new THREE.MeshStandardMaterial({map: textureLoader.load('textures/window.jpg')});
     geometry = new THREE.PlaneBufferGeometry(18, 13, 8, 8);
     var window1 = new THREE.Mesh(geometry, material);
     window1.rotateY(-Math.PI / 2);
@@ -73,7 +73,7 @@ function createPiramidHouse(x = 0, y = 0, z = 0) {
     house.add(addShadowToObject(window1));
     
     // Window 2
-    material = new THREE.MeshPhongMaterial({map: textureLoader.load('textures/window.jpg')});
+    material = new THREE.MeshStandardMaterial({map: textureLoader.load('textures/window.jpg')});
     geometry = new THREE.PlaneBufferGeometry(18, 13, 8, 8);
     var window2 = new THREE.Mesh(geometry, material);
     window2.rotateY(Math.PI / 2);
@@ -81,7 +81,7 @@ function createPiramidHouse(x = 0, y = 0, z = 0) {
     house.add(addShadowToObject(window2));
 
     // Doors
-    material = new THREE.MeshPhongMaterial({map: textureLoader.load('textures/door.jpg')});
+    material = new THREE.MeshStandardMaterial({map: textureLoader.load('textures/door.jpg')});
     geometry = new THREE.PlaneBufferGeometry(9, 20, 8, 8);
     var doorFront = new THREE.Mesh(geometry, material);
     doorFront.rotateY(-Math.PI / 2);

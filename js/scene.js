@@ -44,8 +44,9 @@ addModel("./models/json/tree-toon.json", 10, 0, 0, 10).then(function (obj) {
 });
 
 
-scene.add(createPiramidHouse(100, 0, 30));
-scene.add(createPiramidHouse(100, 0, -100));
+scene.add(createpyramidHouse(100, 0, 30));
+scene.add(createpyramidHouse(100, 0, -100));
+scene.add(createTentHouse(-100, 0, 00));
 
 // import camera control and rotation library
 controls = new THREE.OrbitControls(camera);

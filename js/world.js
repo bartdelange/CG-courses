@@ -77,7 +77,7 @@ function addWorldObjects(scene) {
     grass.wrapS = THREE.RepeatWrapping;
 
     var groundGeo = new THREE.PlaneGeometry(10000, 10000);
-    var groundMat = new THREE.MeshPhongMaterial({ map: grass })
+    var groundMat = new THREE.MeshStandardMaterial({ map: grass })
     var ground = new THREE.Mesh(groundGeo, groundMat);
     ground.position.set(0, 0, 0);
     ground.rotation.x -= Math.PI / 2;
