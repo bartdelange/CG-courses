@@ -40,25 +40,21 @@ controls.dampingFactor = 1;
 addWorldObjects(scene);
 scene.add(createpyramidHouse(100, 0, 30));
 scene.add(createpyramidHouse(100, 0, -100));
-scene.add(createTentHouse(-100, 0, 00));
-scene.add(createRoad(0, 0, 0, 10000))
+scene.add(createTentHouse(-100, 0, 0));
+scene.add(createRoad(0, 0, 0, 10000));
 
 var car1 = null, car2 = null;
-addModel("models/json/classic-1982-tron-light-cycle-blue-threejs/classic-1982-tron-light-cycle-blue.json", 10, 0, 0, 10).then(function (obj) {
+addModel("models/json/classic-1982-tron-light-cycle-blue-threejs/classic-1982-tron-light-cycle-blue.json", 10, 0, 0, 9).then(function (obj) {
     scene.add(obj);
     car1 = obj;
-    car1.position.set(0, 5, 0);
+    car1.position.set(-15, 2, -10);
     scene.add(car1);
-});
 
-addModel("models/json/classic-1982-tron-light-cycle-blue-threejs/classic-1982-tron-light-cycle-blue.json", 10, 0, 0, 10).then(function (obj) {
-    scene.add(obj);
-    car2 = obj;
-    car2.position.set(0, 5, 100);
-    car2.rotateY(-Math.PI / 2);
+    car2 = obj.clone();
+    car2.position.set(15, 2, 10);
     scene.add(car2);
-});
 
+});
 
 // RENDER
 var render = function () {
