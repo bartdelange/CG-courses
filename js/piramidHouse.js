@@ -69,7 +69,7 @@ function createPiramidHouse(x = 0, y = 0, z = 0) {
     geometry = new THREE.PlaneBufferGeometry(18, 13, 8, 8);
     var window1 = new THREE.Mesh(geometry, material);
     window1.rotateY(-Math.PI / 2);
-    window1.position.set(x - 40.1, 12, z - 9);
+    window1.position.set(x - 40.1, y + 12, z - 9);
     house.add(addShadowToObject(window1));
     
     // Window 2
@@ -77,7 +77,7 @@ function createPiramidHouse(x = 0, y = 0, z = 0) {
     geometry = new THREE.PlaneBufferGeometry(18, 13, 8, 8);
     var window2 = new THREE.Mesh(geometry, material);
     window2.rotateY(Math.PI / 2);
-    window2.position.set(x - 40.1+80.2, 12, z );
+    window2.position.set(x - 40.1+80.2, y + 12, z );
     house.add(addShadowToObject(window2));
 
     // Doors
@@ -85,12 +85,15 @@ function createPiramidHouse(x = 0, y = 0, z = 0) {
     geometry = new THREE.PlaneBufferGeometry(9, 20, 8, 8);
     var doorFront = new THREE.Mesh(geometry, material);
     doorFront.rotateY(-Math.PI / 2);
-    doorFront.position.set(x - 40.1, 10, z + 11);
+    doorFront.position.set(x - 40.1, y + 10, z + 11);
     house.add(addShadowToObject(doorFront));
 
     // Adding a fixed tree and mailbox to the house
-    house.add(mailbox(x - 50, 0, z + 4));
-    house.add(bigCanopyTree(x - 30, 0, z + 50));
+    house.add(mailbox(x - 50, y, z + 4));
+    house.add(bigCanopyTree(x - 30, y, z + 50));
+
+    
+    addModel("./models/json/lamp.json", x - 60, y, z + 25, 0.3).then(function (obj) { house.add(obj) });
 
     return house
 }
