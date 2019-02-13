@@ -58,7 +58,7 @@ dirLight.shadow.bias = - 0.0001;
 
 // Create a sun shape
 var sunGeometry = new THREE.SphereGeometry(60, 64, 64);
-var sunMaterial = new THREE.MeshBasicMaterial({ map: textureLoader.load('sun.jpg') });
+var sunMaterial = new THREE.MeshBasicMaterial({ map: textureLoader.load('textures/sun.jpg') });
 var sun = new THREE.Mesh(sunGeometry, sunMaterial);
 sun.position.set(-20, 27.5, 20);
 sun.position.multiplyScalar(50);
@@ -177,7 +177,7 @@ function createHouse(x = 0, y = 0, z = 0) {
 
     });
 
-    material = new THREE.MeshBasicMaterial({map: texture});
+    material = new THREE.MeshPhongMaterial({map: texture});
     var cube = new THREE.Mesh(geometry, material);
     cube.position.set(x, y + 12, z);
     cube.rotateY(-Math.PI / 2);
