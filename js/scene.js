@@ -1,5 +1,6 @@
 // Create scene and default loaders
 var scene = new THREE.Scene();
+var clock = new THREE.Clock();
 var textureLoader = new THREE.TextureLoader();
 var objectLoader = new THREE.ObjectLoader();
 textureLoader.crossOrigin = null;
@@ -36,20 +37,44 @@ addWorldObjects(scene);
 /***************
  * Random tree *
  ***************/
-addModel("./models/json/tree-toon.json", 10, 0, 0, 10).then(function (obj) { scene.add(obj) });
+var tree1;
+addModel("./models/json/tree-toon.json", 10, 0, 0, 10).then(function (obj) {
+    scene.add(obj);
+    tree1 = obj;
+});
 
 
-scene.add(createPiramidHouse(100, 0, 50));
-scene.add(createPiramidHouse(100, 0, -50));
+scene.add(createPiramidHouse(100, 0, 30));
+scene.add(createPiramidHouse(100, 0, -100));
 
 // import camera control and rotation library
 controls = new THREE.OrbitControls(camera);
 controls.enableKeys = true;
 controls.dampingFactor = 1;
 
+var car1 = null, car2 = null;
+addModel("models/json/classic-1982-tron-light-cycle-blue-threejs/classic-1982-tron-light-cycle-blue.json", 10, 0, 0, 10).then(function (obj) {
+    scene.add(obj);
+    car1 = obj;
+    car1.position.set(0, 5, 0);
+    scene.add(car1);
+});
+console.log("hi");
+addModel("models/json/classic-1982-tron-light-cycle-blue-threejs/classic-1982-tron-light-cycle-blue.json", 10, 0, 0, 10).then(function (obj) {
+    scene.add(obj);
+    car2 = obj;
+    car2.position.set(0, 5, 100);
+    car2.rotateY(-Math.PI / 2);
+    scene.add(car2);
+});
+
 // RENDER
 var render = function () {
     requestAnimationFrame(render);
+
+    var delta = clock.getDelta();
+    animateCars(delta, car1, car2);
+    animeTrees(delta, [tree1]);
 
     controls.update();
     renderer.render(scene, camera);
