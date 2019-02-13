@@ -31,15 +31,20 @@ function createTentHouse(x = 0, y = 0, z = 0) {
         new THREE.Vector2(roofSize / 2, roofSize  / 2)
     ], width);
 
-    var material = new THREE.MeshPhongMaterial({ color: 0x00b2fc, specular: 0x00ffff, shininess: 20 });
+    var roofTexture = textureLoader.load('textures/frontend-large.jpg')
+    roofTexture.wrapS = roofTexture.wrapT = THREE.RepeatWrapping;
+    roofTexture.repeat.x = 0.05;
+    roofTexture.repeat.y = 0.05;
+    var material = new THREE.MeshStandardMaterial({ map: roofTexture });
     var prism1 = new THREE.Mesh(geometry, material);
-    // prism1.rotation.x = -Math.PI  /  2;
-    // prism1.rotation.z = -Math.PI  /  2;
     prism1.position.set(x - (roofSize / 2), y + height, z - (width / 2));
 
     scene.add(prism1);
 
-    addModel("./models/json/tree-toon.json", x + 10, y, z + 100, 10).then(function (obj) { house.add(obj) });
+    addModel("./models/json/tree-toon.json", x + 10, y, z + 100, 10).then(function (tree) {
+        addAnimatedTree(tree)
+        house.add(tree)
+    });
 
     return house;
 }

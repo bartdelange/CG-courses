@@ -40,18 +40,24 @@ function animateCars(delta, vehicle1, vehicle2) {
     }
 }
 
-var toSide = 0.03;
-
-function animateTrees(delta, trees) {
-    for (i = 0; i < trees.length; i++) {
-        if (trees[i] == null) {
+window.trees = [];
+function addAnimatedTree(tree) {
+    tree.rotation.x = (Math.random() * 1000 - 500) / 10000
+    window.trees.push({
+        toSide: 0.03,
+        tree
+    })
+}
+function animateTrees(delta) {
+    for (i = 0; i < window.trees.length; i++) {
+        if (window.trees[i].tree == null) {
             break;
         }
-        trees[i].rotation.x += toSide * delta;
-        if (trees[i].rotation.x > 0.05 && toSide > 0) {
-            toSide *= -1;
-        } else if (trees[i].rotation.x < -0.05 && toSide < 0) {
-            toSide *= -1;
+        window.trees[i].tree.rotation.x += window.trees[i].toSide * delta;
+        if (window.trees[i].tree.rotation.x > 0.05 && window.trees[i].toSide > 0) {
+            window.trees[i].toSide *= -1;
+        } else if (window.trees[i].tree.rotation.x < -0.05 && window.trees[i].toSide < 0) {
+            window.trees[i].toSide *= -1;
         }
     }
 }
