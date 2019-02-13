@@ -42,16 +42,15 @@ function animateCars(delta, vehicle1, vehicle2) {
 
 var toSide = 0.03;
 
-function animeTrees(delta, trees) {
-
+function animateTrees(delta, trees) {
     for (i = 0; i < trees.length; i++) {
         if (trees[i] == null) {
             break;
         }
         trees[i].rotation.x += toSide * delta;
-        if (trees[i].rotation.x > 0.05) {
+        if (trees[i].rotation.x > 0.05 && toSide > 0) {
             toSide *= -1;
-        } else if (trees[i].rotation.x < -0.05) {
+        } else if (trees[i].rotation.x < -0.05 && toSide < 0) {
             toSide *= -1;
         }
     }

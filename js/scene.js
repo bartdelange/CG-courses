@@ -74,7 +74,7 @@ var render = function () {
 
     var delta = clock.getDelta();
     animateCars(delta, car1, car2);
-    animeTrees(delta, [tree1]);
+    animateTrees(delta, [tree1]);
 
     controls.update();
     renderer.render(scene, camera);
