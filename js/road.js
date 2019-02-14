@@ -22,15 +22,19 @@ function createRoad(x, y, z, length) {
     road.add(asphalt);
 
     // Curb
+    var curbMaterial = textureLoader.load('textures/stone.jpg');
+    curbMaterial.repeat.set(1, length);
+    curbMaterial.wrapT = curbMaterial.wrapS = THREE.RepeatWrapping;
+    // Curb right
     var geometry = new THREE.BoxGeometry(2, length, 1);
-    var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    var material = new THREE.MeshBasicMaterial({ map: curbMaterial });
     var curbLeft = new THREE.Mesh(geometry, material);
     curbLeft.rotateX(-Math.PI / 2);
     curbLeft.position.set(x + (roadWidth / 2), y + 1, z - 30);
     road.add(curbLeft);
-
+    // Curb left
     var geometry = new THREE.BoxGeometry(2, length, 1);
-    var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    var material = new THREE.MeshBasicMaterial({ map: curbMaterial });
     var curbRight = new THREE.Mesh(geometry, material);
     curbRight.rotateX(-Math.PI / 2);
     curbRight.position.set(x - (roadWidth / 2), y + 1, z - 30);

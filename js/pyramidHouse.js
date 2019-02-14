@@ -94,14 +94,8 @@ function createpyramidHouse(x = 0, y = 0, z = 0) {
 
     // Adding a lampposts
     addModel("./models/json/lamp.json", x - 60, y, z + 25, 0.3).then(function (obj) { house.add(obj) });
-    var light = new THREE.PointLight(0xff0000, 1, 100);
-    light.position.set(x - 60, y + 26, z + 25);
-    scene.add(light);
-
-
     var textureFlare0 = textureLoader.load('textures/lensflare0.png');
-    var light = new THREE.PointLight(0xffffff, 1.5, 2000);
-    light.color.setHSL(0.55, 0.9, 0.5);
+    var light = new THREE.PointLight(0xffff33, 1.5, 50);
     light.position.set(x - 60, y + 26, z + 25);
     house.add(light);
     var lensflare = new THREE.Lensflare();
